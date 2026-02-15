@@ -1,29 +1,21 @@
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
-# Ruta principal
+# Página principal
 @app.route("/")
 def inicio():
-    return "Bienvenido a Biblioteca Virtual – Sistema desarrollado por Jossel 🚀"
+    return render_template("index.html")
 
-
-# Ruta dinámica para consultar un libro
+# Página dinámica de libro
 @app.route("/libro/<titulo>")
 def libro(titulo):
-    return f"Libro: {titulo} – consulta realizada correctamente en la Biblioteca Virtual."
+    return render_template("libro.html", titulo=titulo)
 
-
-# Ruta dinámica para usuario que inicia sesión
+# Página dinámica de usuario
 @app.route("/usuario/<nombre>")
 def usuario(nombre):
-    return f"Bienvenido, {nombre}. Tu sesión en la Biblioteca Virtual está activa."
-
-
-# Ruta dinámica para préstamo de libro
-@app.route("/prestamo/<nombre>/<titulo>")
-def prestamo(nombre, titulo):
-    return f"{nombre}, tu solicitud de préstamo del libro '{titulo}' está en proceso."
+    return render_template("usuario.html", nombre=nombre)
 
 
 if __name__ == "__main__":
