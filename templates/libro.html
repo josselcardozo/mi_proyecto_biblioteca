@@ -1,12 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Consulta de Libro</title>
-</head>
-<body style="text-align:center; font-family: Arial;">
-    <h1>📖 Detalle del Libro</h1>
-    <h2>{{ titulo }}</h2>
-    <p>Consulta realizada correctamente en la Biblioteca Virtual.</p>
-    <a href="/">Volver al inicio</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5 text-center">
+    <h2>📖 Libro consultado</h2>
+    <p>Has consultado el libro: <strong>{{ titulo }}</strong></p>
+    <a href="/" class="btn btn-primary mt-3">Volver al inicio</a>
+</div>
+
+{% endblock %}

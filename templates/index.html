@@ -1,34 +1,34 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Biblioteca Virtual</title>
-    <style>
-        body {
-            font-family: Arial;
-            text-align: center;
-            background-color: #f4f4f4;
-        }
-        .contenedor {
-            margin-top: 100px;
-        }
-        h1 {
-            color: #2c3e50;
-        }
-        a {
-            display: block;
-            margin: 10px;
-            text-decoration: none;
-            color: #3498db;
-        }
-    </style>
-</head>
-<body>
-    <div class="contenedor">
-        <h1>📚 Biblioteca Virtual</h1>
-        <p>Sistema desarrollado por Jossel</p>
+{% extends "base.html" %}
 
-        <a href="/libro/DonQuijote">Consultar Libro</a>
-        <a href="/usuario/Jossel">Ingresar como Usuario</a>
-    </div>
-</body>
-</html>
+{% block content %}
+
+<h2>Listado de Libros</h2>
+
+<table class="table table-striped">
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Autor</th>
+        <th>Cantidad</th>
+        <th>Precio</th>
+        <th>Acciones</th>
+    </tr>
+
+    {% for libro in libros %}
+    <tr>
+        <td>{{ libro[0] }}</td>
+        <td>{{ libro[1] }}</td>
+        <td>{{ libro[2] }}</td>
+        <td>{{ libro[3] }}</td>
+        <td>{{ libro[4] }}</td>
+        <td>
+            <a href="/editar/{{ libro[0] }}" class="btn btn-warning btn-sm">Editar</a>
+            <a href="/eliminar/{{ libro[0] }}" class="btn btn-danger btn-sm">Eliminar</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="/agregar" class="btn btn-primary">Agregar Libro</a>
+
+{% endblock %}
