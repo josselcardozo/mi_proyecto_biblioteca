@@ -1,42 +1,26 @@
 from flask import Flask, render_template, request, redirect
-import sqlite3
+from inventario.bd import db
+from inventario.productos import Producto
 
 app = Flask(__name__)
 
-# -----------------------------
-# CREAR TABLA
-# -----------------------------
-def crear_tabla():
-    conexion = sqlite3.connect("biblioteca.db")
-    cursor = conexion.cursor()
+# 🔹 Configuración SQLite
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///biblioteca.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS libros (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            autor TEXT NOT NULL,
-            cantidad INTEGER NOT NULL,
-            precio REAL NOT NULL
-        )
-    """)
+db.init_app(app)
 
-    conexion.commit()
-    conexion.close()
-
+# 🔹 Crear tablas automáticamente
+with app.app_context():
+    db.create_all()
 
 # -----------------------------
-# OBTENER LIBROS
+# INICIO
 # -----------------------------
-def obtener_libros():
-    conexion = sqlite3.connect("biblioteca.db")
-    cursor = conexion.cursor()
-
-    cursor.execute("SELECT * FROM libros")
-    libros = cursor.fetchall()
-
-    conexion.close()
-    return libros
-
+@app.route("/")
+def index():
+    libros = Producto.query.all()
+    return render_template("index.html", libros=libros)
 
 # -----------------------------
 # AGREGAR LIBRO
@@ -46,84 +30,55 @@ def agregar():
     if request.method == "POST":
         nombre = request.form["nombre"]
         autor = request.form["autor"]
-        cantidad = request.form["cantidad"]
-        precio = request.form["precio"]
+        cantidad = int(request.form["cantidad"])
+        precio = float(request.form["precio"])
 
-        conexion = sqlite3.connect("biblioteca.db")
-        cursor = conexion.cursor()
+        nuevo_libro = Producto(
+            nombre=nombre,
+            autor=autor,
+            cantidad=cantidad,
+            precio=precio
+        )
 
-        cursor.execute("""
-            INSERT INTO libros (nombre, autor, cantidad, precio)
-            VALUES (?, ?, ?, ?)
-        """, (nombre, autor, cantidad, precio))
-
-        conexion.commit()
-        conexion.close()
+        db.session.add(nuevo_libro)
+        db.session.commit()
 
         return redirect("/")
 
     return render_template("agregar.html")
-
 
 # -----------------------------
 # EDITAR LIBRO
 # -----------------------------
 @app.route("/editar/<int:id>", methods=["GET", "POST"])
 def editar(id):
-    conexion = sqlite3.connect("biblioteca.db")
-    cursor = conexion.cursor()
+    libro = Producto.query.get_or_404(id)
 
     if request.method == "POST":
-        nombre = request.form["nombre"]
-        autor = request.form["autor"]
-        cantidad = request.form["cantidad"]
-        precio = request.form["precio"]
+        libro.nombre = request.form["nombre"]
+        libro.autor = request.form["autor"]
+        libro.cantidad = int(request.form["cantidad"])
+        libro.precio = float(request.form["precio"])
 
-        cursor.execute("""
-            UPDATE libros
-            SET nombre = ?, autor = ?, cantidad = ?, precio = ?
-            WHERE id = ?
-        """, (nombre, autor, cantidad, precio, id))
-
-        conexion.commit()
-        conexion.close()
-
+        db.session.commit()
         return redirect("/")
 
-    cursor.execute("SELECT * FROM libros WHERE id = ?", (id,))
-    libro = cursor.fetchone()
-    conexion.close()
-
     return render_template("editar.html", libro=libro)
-
 
 # -----------------------------
 # ELIMINAR LIBRO
 # -----------------------------
 @app.route("/eliminar/<int:id>")
 def eliminar(id):
-    conexion = sqlite3.connect("biblioteca.db")
-    cursor = conexion.cursor()
+    libro = Producto.query.get_or_404(id)
 
-    cursor.execute("DELETE FROM libros WHERE id = ?", (id,))
-    conexion.commit()
-    conexion.close()
+    db.session.delete(libro)
+    db.session.commit()
 
     return redirect("/")
-
-
-# -----------------------------
-# INICIO
-# -----------------------------
-@app.route("/")
-def index():
-    libros = obtener_libros()
-    return render_template("index.html", libros=libros)
-
 
 # -----------------------------
 # EJECUTAR
 # -----------------------------
 if __name__ == "__main__":
-    crear_tabla()
     app.run(debug=True)
