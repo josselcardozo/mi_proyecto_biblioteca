@@ -1,3 +1,9 @@
+from inventario.inventario import (
+    guardar_txt, leer_txt,
+    guardar_json, leer_json,
+    guardar_csv, leer_csv
+)
+
 from flask import Flask, render_template, request, redirect
 from inventario.bd import db
 from inventario.productos import Producto
@@ -76,6 +82,31 @@ def eliminar(id):
     db.session.commit()
 
     return redirect("/")
+
+
+# -----------------------------
+# DATOS (TXT, JSON, CSV)
+# -----------------------------
+@app.route("/datos", methods=["GET", "POST"])
+def datos():
+    if request.method == "POST":
+        nombre = request.form["nombre"]
+        precio = request.form["precio"]
+
+        guardar_txt(nombre, precio)
+        guardar_json(nombre, precio)
+        guardar_csv(nombre, precio)
+
+    datos_txt = leer_txt()
+    datos_json = leer_json()
+    datos_csv = leer_csv()
+
+    return render_template(
+        "datos.html",
+        datos_txt=datos_txt,
+        datos_json=datos_json,
+        datos_csv=datos_csv
+    )
 
 # -----------------------------
 # EJECUTAR

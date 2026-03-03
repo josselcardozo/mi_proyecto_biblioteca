@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Persistencia de Datos</h2>
+
+<form method="POST">
+    <input type="text" name="nombre" placeholder="Nombre" required>
+    <input type="text" name="precio" placeholder="Precio" required>
+    <button type="submit">Guardar</button>
+</form>
+
+<h3>Datos TXT</h3>
+<ul>
+    {% for d in datos_txt %}
+        <li>{{ d }}</li>
+    {% endfor %}
+</ul>
+
+<h3>Datos JSON</h3>
+<ul>
+    {% for d in datos_json %}
+        <li>{{ d }}</li>
+    {% endfor %}
+</ul>
+
+<h3>Datos CSV</h3>
+<ul>
+    {% for d in datos_csv %}
+        <li>{{ d }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
