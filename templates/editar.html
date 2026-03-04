@@ -6,19 +6,19 @@
 
 <form method="POST">
     <div class="mb-3">
-        <input type="text" name="nombre" class="form-control" value="{{ libro[1] }}" required>
+        <input type="text" name="nombre" class="form-control" value="{{ libro.nombre }}" required>
     </div>
 
     <div class="mb-3">
-        <input type="text" name="autor" class="form-control" value="{{ libro[2] }}" required>
+        <input type="text" name="autor" class="form-control" value="{{ libro.autor }}" required>
     </div>
 
     <div class="mb-3">
-        <input type="number" name="cantidad" class="form-control" value="{{ libro[3] }}" required>
+        <input type="number" name="cantidad" class="form-control" value="{{ libro.cantidad }}" required>
     </div>
 
     <div class="mb-3">
-        <input type="number" step="0.01" name="precio" class="form-control" value="{{ libro[4] }}" required>
+        <input type="number" step="0.01" name="precio" class="form-control" value="{{ libro.precio }}" required>
     </div>
 
     <button class="btn btn-warning">Actualizar</button>
