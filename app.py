@@ -1,3 +1,7 @@
+from flask import Flask, render_template, request, redirect
+from conexion.conexion import obtener_conexion
+
+app = Flask(__name__)
 from inventario.inventario import (
     guardar_txt, leer_txt,
     guardar_json, leer_json,
@@ -25,34 +29,42 @@ with app.app_context():
 # -----------------------------
 @app.route("/")
 def index():
-    libros = Producto.query.all()
+
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    cursor.execute("SELECT * FROM libros")
+    libros = cursor.fetchall()
+
+    conexion.close()
+
     return render_template("index.html", libros=libros)
 
 # -----------------------------
 # AGREGAR LIBRO
 # -----------------------------
-@app.route("/agregar", methods=["GET", "POST"])
+@app.route("/agregar", methods=["GET","POST"])
 def agregar():
+
     if request.method == "POST":
+
         nombre = request.form["nombre"]
         autor = request.form["autor"]
-        cantidad = int(request.form["cantidad"])
-        precio = float(request.form["precio"])
+        cantidad = request.form["cantidad"]
+        precio = request.form["precio"]
 
-        nuevo_libro = Producto(
-            nombre=nombre,
-            autor=autor,
-            cantidad=cantidad,
-            precio=precio
-        )
+        conexion = obtener_conexion()
+        cursor = conexion.cursor()
 
-        db.session.add(nuevo_libro)
-        db.session.commit()
+        sql = "INSERT INTO libros (nombre, autor, cantidad, precio) VALUES (%s,%s,%s,%s)"
+        cursor.execute(sql,(nombre,autor,cantidad,precio))
+
+        conexion.commit()
+        conexion.close()
 
         return redirect("/")
 
     return render_template("agregar.html")
-
 # -----------------------------
 # EDITAR LIBRO
 # -----------------------------

@@ -15,20 +15,21 @@
     </tr>
 
     {% for libro in libros %}
-    <tr>
-        <td>{{ libro.id }}</td>
-        <td>{{ libro.nombre }}</td>
-        <td>{{ libro.autor }}</td>
-        <td>{{ libro.cantidad }}</td>
-        <td>{{ libro.precio }}</td>
-        <td>
-            <a href="{{ url_for('editar', id=libro.id) }}" class="btn btn-warning btn-sm">Editar</a>
-            <a href="{{ url_for('eliminar', id=libro.id) }}" class="btn btn-danger btn-sm">Eliminar</a>
-        </td>
-    </tr>
-    {% endfor %}
+<tr>
+    <td>{{ libro[0] }}</td>
+    <td>{{ libro[1] }}</td>
+    <td>{{ libro[2] }}</td>
+    <td>{{ libro[3] }}</td>
+    <td>{{ libro[4] }}</td>
+
+    <td>
+        <a href="{{ url_for('editar', id=libro[0]) }}" class="btn btn-warning btn-sm">Editar</a>
+        <a href="{{ url_for('eliminar', id=libro[0]) }}" class="btn btn-danger btn-sm">Eliminar</a>
+    </td>
+</tr>
+{% endfor %}
 </table>
 
 <a href="{{ url_for('agregar') }}" class="btn btn-primary">Agregar Libro</a>
 
-{% endblock %}
+{% endblock %}cd C:\mi_proyecto_biblioteca
