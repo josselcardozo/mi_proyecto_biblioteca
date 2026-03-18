@@ -35,6 +35,17 @@ Sistema de gestión de biblioteca desarrollado con:
 
 ---
 
+# Sistema Biblioteca Flask
+
+Proyecto desarrollado con:
+- Flask
+- MySQL
+- Flask-Login
+
+Funcionalidades:
+- Registro de usuarios
+- Login y logout
+- CRUD de libros
 ## 👨‍💻 Autor
 
 Desarrollado por Jossel
