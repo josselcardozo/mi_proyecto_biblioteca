@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
 import sqlite3
 
@@ -6,10 +6,10 @@ app = Flask(__name__)
 app.secret_key = "12345"
 
 # -------------------------
-# CONEXIÓN SQLITE
+# CONEXIÓN DB
 # -------------------------
 def obtener_conexion():
-    conexion = sqlite3.connect("biblioteca.db")
+    conexion = sqlite3.connect("database.db")
     conexion.row_factory = sqlite3.Row
     return conexion
 
@@ -22,7 +22,6 @@ class Usuario(UserMixin):
         self.nombre = nombre
         self.email = email
         self.password = password
-
 
 class Libro:
     def __init__(self, id, nombre, autor, cantidad, precio):
@@ -49,12 +48,7 @@ def load_user(user_id):
     conexion.close()
 
     if user:
-        return Usuario(
-            user["id_usuario"],
-            user["nombre"],
-            user["email"],
-            user["password"]
-        )
+        return Usuario(user["id_usuario"], user["nombre"], user["email"], user["password"])
 
 # -------------------------
 # CREAR TABLAS
@@ -86,31 +80,28 @@ def crear_tablas():
     conexion.close()
 
 # -------------------------
-# CREAR ADMIN
+# CREAR ADMIN AUTOMÁTICO
 # -------------------------
 def crear_admin():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    cursor.execute("SELECT * FROM usuarios WHERE email=?", ("admin@gmail.com",))
+    cursor.execute("SELECT * FROM usuarios WHERE email=?", ("jossel@gmail.com",))
     user = cursor.fetchone()
 
     if not user:
         cursor.execute(
             "INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
-            ("admin", "admin@gmail.com", "1234")
+            ("jossel", "jossel@gmail.com", "1234")
         )
         conexion.commit()
 
     conexion.close()
 
-crear_tablas()
-crear_admin()
-
 # -------------------------
 # LOGIN
 # -------------------------
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["GET","POST"])
 def login():
     if request.method == "POST":
         email = request.form["email"]
@@ -135,7 +126,7 @@ def login():
                 user["password"]
             )
             login_user(usuario)
-            return redirect("/")
+            return redirect(url_for("index"))
         else:
             return "Correo o contraseña incorrectos"
 
@@ -144,7 +135,7 @@ def login():
 # -------------------------
 # REGISTRO
 # -------------------------
-@app.route("/registro", methods=["GET", "POST"])
+@app.route("/registro", methods=["GET","POST"])
 def registro():
     if request.method == "POST":
         nombre = request.form["nombre"]
@@ -189,13 +180,7 @@ def index():
     conexion.close()
 
     libros = [
-        Libro(
-            fila["id"],
-            fila["nombre"],
-            fila["autor"],
-            fila["cantidad"],
-            fila["precio"]
-        )
+        Libro(fila["id"], fila["nombre"], fila["autor"], fila["cantidad"], fila["precio"])
         for fila in datos
     ]
 
@@ -204,7 +189,7 @@ def index():
 # -------------------------
 # AGREGAR
 # -------------------------
-@app.route("/agregar", methods=["GET", "POST"])
+@app.route("/agregar", methods=["GET","POST"])
 @login_required
 def agregar():
     if request.method == "POST":
@@ -231,7 +216,7 @@ def agregar():
 # -------------------------
 # EDITAR
 # -------------------------
-@app.route("/editar/<int:id>", methods=["GET", "POST"])
+@app.route("/editar/<int:id>", methods=["GET","POST"])
 @login_required
 def editar(id):
     conexion = obtener_conexion()
@@ -239,7 +224,7 @@ def editar(id):
 
     if request.method == "POST":
         cursor.execute(
-            "UPDATE libros SET nombre=?,autor=?,cantidad=?,precio=? WHERE id=?",
+            "UPDATE libros SET nombre=?, autor=?, cantidad=?, precio=? WHERE id=?",
             (
                 request.form["nombre"],
                 request.form["autor"],
@@ -254,16 +239,8 @@ def editar(id):
         return redirect("/")
 
     cursor.execute("SELECT * FROM libros WHERE id=?", (id,))
-    fila = cursor.fetchone()
+    libro = cursor.fetchone()
     conexion.close()
-
-    libro = Libro(
-        fila["id"],
-        fila["nombre"],
-        fila["autor"],
-        fila["cantidad"],
-        fila["precio"]
-    )
 
     return render_template("editar.html", libro=libro)
 
@@ -277,14 +254,16 @@ def eliminar(id):
     cursor = conexion.cursor()
 
     cursor.execute("DELETE FROM libros WHERE id=?", (id,))
-    
     conexion.commit()
     conexion.close()
 
     return redirect("/")
 
 # -------------------------
-# RUN
+# INICIO
 # -------------------------
+crear_tablas()
+crear_admin()
+
 if __name__ == "__main__":
     app.run(debug=True)
