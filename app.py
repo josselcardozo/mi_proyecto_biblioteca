@@ -32,14 +32,12 @@ class Libro:
         self.cantidad = cantidad
         self.precio = precio
 
-
 # -------------------------
 # LOGIN MANAGER
 # -------------------------
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
-
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -57,7 +55,6 @@ def load_user(user_id):
             user["email"],
             user["password"]
         )
-
 
 # -------------------------
 # CREAR TABLAS
@@ -88,9 +85,8 @@ def crear_tablas():
     conexion.commit()
     conexion.close()
 
-
 # -------------------------
-# CREAR USUARIO ADMIN
+# CREAR ADMIN
 # -------------------------
 def crear_admin():
     conexion = obtener_conexion()
@@ -108,10 +104,8 @@ def crear_admin():
 
     conexion.close()
 
-
 crear_tablas()
 crear_admin()
-print("App iniciando correctamente")
 
 # -------------------------
 # LOGIN
@@ -147,7 +141,6 @@ def login():
 
     return render_template("login.html")
 
-
 # -------------------------
 # REGISTRO
 # -------------------------
@@ -173,7 +166,6 @@ def registro():
 
     return render_template("registro.html")
 
-
 # -------------------------
 # LOGOUT
 # -------------------------
@@ -182,7 +174,6 @@ def registro():
 def logout():
     logout_user()
     return redirect("/login")
-
 
 # -------------------------
 # INDEX
@@ -210,7 +201,6 @@ def index():
 
     return render_template("index.html", libros=libros)
 
-
 # -------------------------
 # AGREGAR
 # -------------------------
@@ -237,7 +227,6 @@ def agregar():
         return redirect("/")
 
     return render_template("agregar.html")
-
 
 # -------------------------
 # EDITAR
@@ -278,6 +267,21 @@ def editar(id):
 
     return render_template("editar.html", libro=libro)
 
+# -------------------------
+# ELIMINAR
+# -------------------------
+@app.route("/eliminar/<int:id>")
+@login_required
+def eliminar(id):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    cursor.execute("DELETE FROM libros WHERE id=?", (id,))
+    
+    conexion.commit()
+    conexion.close()
+
+    return redirect("/")
 
 # -------------------------
 # RUN
