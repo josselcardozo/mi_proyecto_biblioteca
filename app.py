@@ -111,6 +111,7 @@ def crear_admin():
 
 crear_tablas()
 crear_admin()
+print("App iniciando correctamente")
 
 # -------------------------
 # LOGIN
