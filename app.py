@@ -154,3 +154,31 @@ def editar(id):
     conexion.close()
 
     return render_template("editar.html", libro=libro)
+
+    def crear_tablas():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS usuarios (
+        id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT,
+        email TEXT,
+        password TEXT
+    )
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS libros (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT,
+        autor TEXT,
+        cantidad INTEGER,
+        precio REAL
+    )
+    """)
+
+    conexion.commit()
+    conexion.close()
+
+crear_tablas()
