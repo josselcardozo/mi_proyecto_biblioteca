@@ -1,3 +1,5 @@
+from flask_login import UserMixin
+
 class Libro:from flask_login import UserMixin
 
 class Usuario(UserMixin):
