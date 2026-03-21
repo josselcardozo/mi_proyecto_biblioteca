@@ -11,10 +11,10 @@
 
     <h2 class="mb-4">📚 Sistema de Biblioteca</h2>
 
-    <a href="/logout" class="btn btn-danger mb-3">Cerrar sesión</a>
-    <a href="/agregar" class="btn btn-success mb-3">Agregar Libro</a>
+    <a href="{{ url_for('logout') }}" class="btn btn-danger mb-3">Cerrar sesión</a>
+    <a href="{{ url_for('agregar') }}" class="btn btn-success mb-3">Agregar Libro</a>
 
-    <table class="table table-bordered">
+    <table class="table table-bordered table-hover">
         <thead class="table-dark">
             <tr>
                 <th>ID</th>
@@ -29,16 +29,27 @@
         <tbody>
         {% for libro in libros %}
             <tr>
-                <td>{{ libro[0] }}</td>
-                <td>{{ libro[1] }}</td>
-                <td>{{ libro[2] }}</td>
-                <td>{{ libro[3] }}</td>
-                <td>{{ libro[4] }}</td>
+                <td>{{ libro.id }}</td>
+                <td>{{ libro.nombre }}</td>
+                <td>{{ libro.autor }}</td>
+                <td>{{ libro.cantidad }}</td>
+                <td>${{ libro.precio }}</td>
 
                 <td>
-                    <a href="/editar/{{ libro[0] }}" class="btn btn-warning btn-sm">Editar</a>
-                    <a href="/eliminar/{{ libro[0] }}" class="btn btn-danger btn-sm">Eliminar</a>
+                    <a href="{{ url_for('editar', id=libro.id) }}" class="btn btn-warning btn-sm">
+                        Editar
+                    </a>
+
+                    <a href="{{ url_for('eliminar', id=libro.id) }}" 
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Seguro que deseas eliminar este libro?')">
+                        Eliminar
+                    </a>
                 </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6" class="text-center">No hay libros registrados</td>
             </tr>
         {% endfor %}
         </tbody>
