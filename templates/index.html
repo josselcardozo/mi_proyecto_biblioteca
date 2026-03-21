@@ -1,35 +1,50 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Biblioteca</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
 
-{% block content %}
+<body class="bg-light">
 
-<h2>Listado de Libros</h2>
+<div class="container mt-4">
 
-<table class="table table-striped">
-    <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Autor</th>
-        <th>Cantidad</th>
-        <th>Precio</th>
-        <th>Acciones</th>
-    </tr>
+    <h2 class="mb-4">📚 Sistema de Biblioteca</h2>
 
-    {% for libro in libros %}
-<tr>
-    <td>{{ libro[0] }}</td>
-    <td>{{ libro[1] }}</td>
-    <td>{{ libro[2] }}</td>
-    <td>{{ libro[3] }}</td>
-    <td>{{ libro[4] }}</td>
+    <a href="/logout" class="btn btn-danger mb-3">Cerrar sesión</a>
+    <a href="/agregar" class="btn btn-success mb-3">Agregar Libro</a>
 
-    <td>
-        <a href="{{ url_for('editar', id=libro[0]) }}" class="btn btn-warning btn-sm">Editar</a>
-        <a href="{{ url_for('eliminar', id=libro[0]) }}" class="btn btn-danger btn-sm">Eliminar</a>
-    </td>
-</tr>
-{% endfor %}
-</table>
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Autor</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
 
-<a href="{{ url_for('agregar') }}" class="btn btn-primary">Agregar Libro</a>
+        <tbody>
+        {% for libro in libros %}
+            <tr>
+                <td>{{ libro[0] }}</td>
+                <td>{{ libro[1] }}</td>
+                <td>{{ libro[2] }}</td>
+                <td>{{ libro[3] }}</td>
+                <td>{{ libro[4] }}</td>
 
-{% endblock %}cd C:\mi_proyecto_biblioteca
+                <td>
+                    <a href="/editar/{{ libro[0] }}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="/eliminar/{{ libro[0] }}" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>
