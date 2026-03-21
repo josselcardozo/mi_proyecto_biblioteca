@@ -31,31 +31,31 @@ def load_user(user_id):
 @app.route("/login", methods=["GET","POST"])
 def login():
     if request.method == "POST":
-        try:
-            email = request.form["email"]
-            password = request.form["password"]
+        email = request.form["email"]
+        password = request.form["password"]
 
-            conexion = obtener_conexion()
-            cursor = conexion.cursor()
+        conexion = obtener_conexion()
+        cursor = conexion.cursor()
 
-            cursor.execute(
-                "SELECT * FROM usuarios WHERE email=%s AND password=%s",
-                (email, password)
+        cursor.execute(
+            "SELECT * FROM usuarios WHERE email=? AND password=?",
+            (email, password)
+        )
+
+        user = cursor.fetchone()
+        conexion.close()
+
+        if user:
+            usuario = Usuario(
+                user["id_usuario"],
+                user["nombre"],
+                user["email"],
+                user["password"]
             )
-
-            user = cursor.fetchone()
-            conexion.close()
-
-            # 🔥 VALIDACIÓN CLAVE
-            if user:
-                usuario = Usuario(user[0], user[1], user[2], user[3])
-                login_user(usuario)
-                return redirect("/")
-            else:
-                return "Correo o contraseña incorrectos"
-
-        except Exception as e:
-            return f"Error: {e}"  # 🔥 ESTO TE MOSTRARÁ EL ERROR REAL
+            login_user(usuario)
+            return redirect("/")
+        else:
+            return "Correo o contraseña incorrectos"
 
     return render_template("login.html")
 # -------------------------
