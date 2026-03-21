@@ -86,16 +86,16 @@ def crear_admin():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    cursor.execute("SELECT * FROM usuarios WHERE email=?", ("jossel@gmail.com",))
-    user = cursor.fetchone()
+    # 🔥 BORRA SI EXISTE
+    cursor.execute("DELETE FROM usuarios WHERE email=?", ("jossel@gmail.com",))
 
-    if not user:
-        cursor.execute(
-            "INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
-            ("jossel", "jossel@gmail.com", "1234")
-        )
-        conexion.commit()
+    # 🔥 CREA SIEMPRE
+    cursor.execute(
+        "INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
+        ("jossel", "jossel@gmail.com", "1234")
+    )
 
+    conexion.commit()
     conexion.close()
 
 # -------------------------
