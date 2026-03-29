@@ -1,17 +1,26 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_file
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
-import sqlite3
+import mysql.connector
+from fpdf import FPDF
+
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
 
 app = Flask(__name__)
 app.secret_key = "12345"
 
 # -------------------------
-# CONEXIÓN DB
+# CONEXIÓN MYSQL
 # -------------------------
 def obtener_conexion():
-    conexion = sqlite3.connect("database.db")
-    conexion.row_factory = sqlite3.Row
-    return conexion
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="biblioteca"
+    )
 
 # -------------------------
 # MODELOS
@@ -41,9 +50,9 @@ login_manager.login_view = "login"
 @login_manager.user_loader
 def load_user(user_id):
     conexion = obtener_conexion()
-    cursor = conexion.cursor()
+    cursor = conexion.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM usuarios WHERE id_usuario=?", (user_id,))
+    cursor.execute("SELECT * FROM usuarios WHERE id_usuario=%s", (user_id,))
     user = cursor.fetchone()
     conexion.close()
 
@@ -51,51 +60,22 @@ def load_user(user_id):
         return Usuario(user["id_usuario"], user["nombre"], user["email"], user["password"])
 
 # -------------------------
-# CREAR TABLAS
-# -------------------------
-def crear_tablas():
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS usuarios (
-        id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT,
-        email TEXT,
-        password TEXT
-    )
-    """)
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS libros (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT,
-        autor TEXT,
-        cantidad INTEGER,
-        precio REAL
-    )
-    """)
-
-    conexion.commit()
-    conexion.close()
-
-# -------------------------
-# CREAR ADMIN AUTOMÁTICO
+# CREAR ADMIN
 # -------------------------
 def crear_admin():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    # 🔥 BORRA SI EXISTE
-    cursor.execute("DELETE FROM usuarios WHERE email=?", ("jossel@gmail.com",))
+    cursor.execute("SELECT * FROM usuarios WHERE email=%s", ("admin@gmail.com",))
+    user = cursor.fetchone()
 
-    # 🔥 CREA SIEMPRE
-    cursor.execute(
-        "INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
-        ("jossel", "jossel@gmail.com", "1234")
-    )
+    if not user:
+        cursor.execute(
+            "INSERT INTO usuarios (nombre,email,password) VALUES (%s,%s,%s)",
+            ("admin", "admin@gmail.com", "1234")
+        )
+        conexion.commit()
 
-    conexion.commit()
     conexion.close()
 
 # -------------------------
@@ -108,10 +88,10 @@ def login():
         password = request.form["password"]
 
         conexion = obtener_conexion()
-        cursor = conexion.cursor()
+        cursor = conexion.cursor(dictionary=True)
 
         cursor.execute(
-            "SELECT * FROM usuarios WHERE email=? AND password=?",
+            "SELECT * FROM usuarios WHERE email=%s AND password=%s",
             (email, password)
         )
 
@@ -132,6 +112,63 @@ def login():
 
     return render_template("login.html")
 
+    @app.route("/reporte")
+@login_required
+def reporte():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    cursor.execute("SELECT * FROM libros")
+    libros = cursor.fetchall()
+    conexion.close()
+
+    # Crear PDF
+    pdf = SimpleDocTemplate("reporte_libros.pdf", pagesize=letter)
+
+    elementos = []
+
+    estilos = getSampleStyleSheet()
+
+    # 🔥 TÍTULO en Times New Roman
+    titulo = Paragraph(
+        "<font name='Times-Roman' size=18>Reporte de Libros</font>",
+        estilos["Title"]
+    )
+
+    elementos.append(titulo)
+
+    # TABLA
+    datos = [["ID", "Nombre", "Autor", "Cantidad", "Precio"]]
+
+    for libro in libros:
+        datos.append([
+            libro["id"],
+            libro["nombre"],
+            libro["autor"],
+            libro["cantidad"],
+            libro["precio"]
+        ])
+
+    tabla = Table(datos)
+
+    # ESTILO
+    tabla.setStyle(TableStyle([
+        ("BACKGROUND", (0,0), (-1,0), colors.grey),
+        ("TEXTCOLOR", (0,0), (-1,0), colors.whitesmoke),
+
+        # 🔥 FUENTE TIMES NEW ROMAN
+        ("FONTNAME", (0,0), (-1,-1), "Times-Roman"),
+
+        ("ALIGN", (0,0), (-1,-1), "CENTER"),
+        ("GRID", (0,0), (-1,-1), 1, colors.black)
+    ]))
+
+    elementos.append(tabla)
+
+    pdf.build(elementos)
+
+    return redirect("/")
+
 # -------------------------
 # REGISTRO
 # -------------------------
@@ -146,7 +183,7 @@ def registro():
         cursor = conexion.cursor()
 
         cursor.execute(
-            "INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
+            "INSERT INTO usuarios (nombre,email,password) VALUES (%s,%s,%s)",
             (nombre, email, password)
         )
 
@@ -167,24 +204,19 @@ def logout():
     return redirect("/login")
 
 # -------------------------
-# INDEX
+# INDEX (LISTAR)
 # -------------------------
 @app.route("/")
 @login_required
 def index():
     conexion = obtener_conexion()
-    cursor = conexion.cursor()
+    cursor = conexion.cursor(dictionary=True)
 
     cursor.execute("SELECT * FROM libros")
     datos = cursor.fetchall()
     conexion.close()
 
-    libros = [
-        Libro(fila["id"], fila["nombre"], fila["autor"], fila["cantidad"], fila["precio"])
-        for fila in datos
-    ]
-
-    return render_template("index.html", libros=libros)
+    return render_template("index.html", libros=datos)
 
 # -------------------------
 # AGREGAR
@@ -202,7 +234,7 @@ def agregar():
         cursor = conexion.cursor()
 
         cursor.execute(
-            "INSERT INTO libros (nombre,autor,cantidad,precio) VALUES (?,?,?,?)",
+            "INSERT INTO libros (nombre,autor,cantidad,precio) VALUES (%s,%s,%s,%s)",
             (nombre, autor, cantidad, precio)
         )
 
@@ -220,11 +252,11 @@ def agregar():
 @login_required
 def editar(id):
     conexion = obtener_conexion()
-    cursor = conexion.cursor()
+    cursor = conexion.cursor(dictionary=True)
 
     if request.method == "POST":
         cursor.execute(
-            "UPDATE libros SET nombre=?, autor=?, cantidad=?, precio=? WHERE id=?",
+            "UPDATE libros SET nombre=%s, autor=%s, cantidad=%s, precio=%s WHERE id=%s",
             (
                 request.form["nombre"],
                 request.form["autor"],
@@ -238,7 +270,7 @@ def editar(id):
         conexion.close()
         return redirect("/")
 
-    cursor.execute("SELECT * FROM libros WHERE id=?", (id,))
+    cursor.execute("SELECT * FROM libros WHERE id=%s", (id,))
     libro = cursor.fetchone()
     conexion.close()
 
@@ -253,16 +285,78 @@ def eliminar(id):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    cursor.execute("DELETE FROM libros WHERE id=?", (id,))
+    cursor.execute("DELETE FROM libros WHERE id=%s", (id,))
     conexion.commit()
     conexion.close()
 
     return redirect("/")
 
 # -------------------------
+# PDF
+# -------------------------
+from flask import make_response
+import io
+
+@app.route("/reporte")
+@login_required
+def reporte():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    cursor.execute("SELECT * FROM libros")
+    libros = cursor.fetchall()
+    conexion.close()
+
+    buffer = io.BytesIO()
+
+    pdf = SimpleDocTemplate(buffer, pagesize=letter)
+
+    elementos = []
+
+    estilos = getSampleStyleSheet()
+
+    # TÍTULO
+    titulo = Paragraph(
+        "<font name='Times-Roman' size=18>Reporte de Libros</font>",
+        estilos["Title"]
+    )
+    elementos.append(titulo)
+
+    # TABLA
+    datos = [["ID", "Nombre", "Autor", "Cantidad", "Precio"]]
+
+    for libro in libros:
+        datos.append([
+            libro["id"],
+            libro["nombre"],
+            libro["autor"],
+            libro["cantidad"],
+            libro["precio"]
+        ])
+
+    tabla = Table(datos)
+
+    tabla.setStyle(TableStyle([
+        ("BACKGROUND", (0,0), (-1,0), colors.grey),
+        ("TEXTCOLOR", (0,0), (-1,0), colors.whitesmoke),
+        ("FONTNAME", (0,0), (-1,-1), "Times-Roman"),
+        ("GRID", (0,0), (-1,-1), 1, colors.black)
+    ]))
+
+    elementos.append(tabla)
+
+    pdf.build(elementos)
+
+    buffer.seek(0)
+
+    response = make_response(buffer.read())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=reporte_libros.pdf'
+
+    return response
+# -------------------------
 # INICIO
 # -------------------------
-crear_tablas()
 crear_admin()
 
 if __name__ == "__main__":
