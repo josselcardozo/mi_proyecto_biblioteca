@@ -14,14 +14,40 @@ app.secret_key = "12345"
 # -------------------------
 # CONEXIÓN MYSQL
 # -------------------------
-def obtener_conexion():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="biblioteca"
-    )
+import sqlite3
 
+def obtener_conexion():
+    conexion = sqlite3.connect("biblioteca.db")
+    conexion.row_factory = sqlite3.Row
+    return conexion
+
+def crear_tablas():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS usuarios (
+        id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT,
+        email TEXT,
+        password TEXT
+    )
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS libros (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT,
+        autor TEXT,
+        cantidad INTEGER,
+        precio REAL
+    )
+    """)
+
+    conexion.commit()
+    conexion.close()
+    crear_tablas()
+crear_admin()
 # -------------------------
 # MODELOS
 # -------------------------
