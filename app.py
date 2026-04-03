@@ -1,4 +1,3 @@
-```python
 from flask import Flask, render_template, request, redirect, url_for, make_response
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
 import sqlite3
@@ -15,8 +14,11 @@ app.secret_key = "12345"
 # -------------------------
 # CONEXIÓN SQLITE
 # -------------------------
+import os
+
 def obtener_conexion():
-    conexion = sqlite3.connect("biblioteca.db")
+    db_path = os.path.join(os.getcwd(), "biblioteca.db")
+    conexion = sqlite3.connect(db_path)
     conexion.row_factory = sqlite3.Row
     return conexion
 
@@ -79,22 +81,25 @@ def load_user(user_id):
         return Usuario(user["id_usuario"], user["nombre"], user["email"], user["password"])
 
 # -------------------------
-# CREAR USUARIO INICIAL
+# INICIALIZACIÓN (FUNCIONA EN RENDER)
 # -------------------------
-def crear_admin():
+@app.before_first_request
+def inicializar():
+    crear_tablas()
+
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    # BORRAR SI EXISTE (para evitar conflictos)
-    cursor.execute("DELETE FROM usuarios WHERE email=?", ("jossel@gmail.com",))
+    cursor.execute("SELECT * FROM usuarios WHERE email=?", ("jossel@gmail.com",))
+    user = cursor.fetchone()
 
-    # CREAR USUARIO
-    cursor.execute(
-        "INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
-        ("Jossel", "jossel@gmail.com", "1234")
-    )
+    if not user:
+        cursor.execute(
+            "INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
+            ("Jossel", "jossel@gmail.com", "1234")
+        )
+        conexion.commit()
 
-    conexion.commit()
     conexion.close()
 
 # -------------------------
@@ -247,7 +252,7 @@ def eliminar(id):
     return redirect("/")
 
 # -------------------------
-# REPORTE PDF (Times New Roman)
+# REPORTE PDF
 # -------------------------
 @app.route("/reporte")
 @login_required
@@ -286,13 +291,9 @@ def reporte():
     return make_response(buffer.read())
 
 # -------------------------
-# INICIO
+# MAIN
 # -------------------------
-crear_tablas()
-crear_admin()
-
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
-```
