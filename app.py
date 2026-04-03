@@ -84,12 +84,13 @@ def load_user(user_id):
 # INICIALIZACIÓN (FUNCIONA EN RENDER)
 # -------------------------
 @app.before_first_request
-def inicializar():
+def inicializar_app():
     crear_tablas()
 
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
+    # CREAR USUARIO SI NO EXISTE
     cursor.execute("SELECT * FROM usuarios WHERE email=?", ("jossel@gmail.com",))
     user = cursor.fetchone()
 
@@ -98,8 +99,18 @@ def inicializar():
             "INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
             ("Jossel", "jossel@gmail.com", "1234")
         )
-        conexion.commit()
 
+    # CREAR LIBRO DE PRUEBA
+    cursor.execute("SELECT * FROM libros")
+    libros = cursor.fetchall()
+
+    if not libros:
+        cursor.execute(
+            "INSERT INTO libros (nombre, autor, cantidad, precio) VALUES (?,?,?,?)",
+            ("Libro Demo", "Autor Demo", 5, 10.0)
+        )
+
+    conexion.commit()
     conexion.close()
 
 # -------------------------
