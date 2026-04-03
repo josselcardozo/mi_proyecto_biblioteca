@@ -11,6 +11,8 @@ from reportlab.lib.styles import getSampleStyleSheet
 app = Flask(__name__)
 app.secret_key = "12345"
 
+inicializar_app()
+
 # -------------------------
 # CONEXIÓN SQLITE
 # -------------------------
@@ -83,35 +85,39 @@ def load_user(user_id):
 # -------------------------
 # INICIALIZACIÓN (FUNCIONA EN RENDER)
 # -------------------------
-@app.before_first_request
+
 def inicializar_app():
-    crear_tablas()
+    try:
+        crear_tablas()
 
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
+        conexion = obtener_conexion()
+        cursor = conexion.cursor()
 
-    # CREAR USUARIO SI NO EXISTE
-    cursor.execute("SELECT * FROM usuarios WHERE email=?", ("jossel@gmail.com",))
-    user = cursor.fetchone()
+        # USUARIO
+        cursor.execute("SELECT * FROM usuarios WHERE email=?", ("jossel@gmail.com",))
+        user = cursor.fetchone()
 
-    if not user:
-        cursor.execute(
-            "INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
-            ("Jossel", "jossel@gmail.com", "1234")
-        )
+        if not user:
+            cursor.execute(
+                "INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
+                ("Jossel", "jossel@gmail.com", "1234")
+            )
 
-    # CREAR LIBRO DE PRUEBA
-    cursor.execute("SELECT * FROM libros")
-    libros = cursor.fetchall()
+        # LIBRO DEMO
+        cursor.execute("SELECT * FROM libros")
+        libros = cursor.fetchall()
 
-    if not libros:
-        cursor.execute(
-            "INSERT INTO libros (nombre, autor, cantidad, precio) VALUES (?,?,?,?)",
-            ("Libro Demo", "Autor Demo", 5, 10.0)
-        )
+        if not libros:
+            cursor.execute(
+                "INSERT INTO libros (nombre, autor, cantidad, precio) VALUES (?,?,?,?)",
+                ("Libro Demo", "Autor Demo", 5, 10.0)
+            )
 
-    conexion.commit()
-    conexion.close()
+        conexion.commit()
+        conexion.close()
+
+    except Exception as e:
+        print("ERROR AL INICIAR:", e)
 
 # -------------------------
 # LOGIN
