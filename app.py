@@ -2,22 +2,22 @@ from flask import Flask, render_template, request, redirect, url_for, make_respo
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
 import sqlite3
 import io
+import os
 
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 
+# -------------------------
+# APP
+# -------------------------
 app = Flask(__name__)
 app.secret_key = "12345"
-
-inicializar_app()
 
 # -------------------------
 # CONEXIÓN SQLITE
 # -------------------------
-import os
-
 def obtener_conexion():
     db_path = os.path.join(os.getcwd(), "biblioteca.db")
     conexion = sqlite3.connect(db_path)
@@ -54,38 +54,8 @@ def crear_tablas():
     conexion.close()
 
 # -------------------------
-# MODELO USUARIO
+# INICIALIZAR APP (CLAVE PARA RENDER)
 # -------------------------
-class Usuario(UserMixin):
-    def __init__(self, id_usuario, nombre, email, password):
-        self.id = id_usuario
-        self.nombre = nombre
-        self.email = email
-        self.password = password
-
-# -------------------------
-# LOGIN MANAGER
-# -------------------------
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = "login"
-
-@login_manager.user_loader
-def load_user(user_id):
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-
-    cursor.execute("SELECT * FROM usuarios WHERE id_usuario=?", (user_id,))
-    user = cursor.fetchone()
-    conexion.close()
-
-    if user:
-        return Usuario(user["id_usuario"], user["nombre"], user["email"], user["password"])
-
-# -------------------------
-# INICIALIZACIÓN (FUNCIONA EN RENDER)
-# -------------------------
-
 def inicializar_app():
     try:
         crear_tablas()
@@ -93,7 +63,7 @@ def inicializar_app():
         conexion = obtener_conexion()
         cursor = conexion.cursor()
 
-        # USUARIO
+        # Usuario por defecto
         cursor.execute("SELECT * FROM usuarios WHERE email=?", ("jossel@gmail.com",))
         user = cursor.fetchone()
 
@@ -103,7 +73,7 @@ def inicializar_app():
                 ("Jossel", "jossel@gmail.com", "1234")
             )
 
-        # LIBRO DEMO
+        # Libro demo
         cursor.execute("SELECT * FROM libros")
         libros = cursor.fetchall()
 
@@ -119,10 +89,42 @@ def inicializar_app():
     except Exception as e:
         print("ERROR AL INICIAR:", e)
 
+# 👉 SE EJECUTA AQUÍ (IMPORTANTE)
+inicializar_app()
+
+# -------------------------
+# LOGIN MANAGER
+# -------------------------
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+# -------------------------
+# MODELO USUARIO
+# -------------------------
+class Usuario(UserMixin):
+    def __init__(self, id_usuario, nombre, email, password):
+        self.id = id_usuario
+        self.nombre = nombre
+        self.email = email
+        self.password = password
+
+@login_manager.user_loader
+def load_user(user_id):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    cursor.execute("SELECT * FROM usuarios WHERE id_usuario=?", (user_id,))
+    user = cursor.fetchone()
+    conexion.close()
+
+    if user:
+        return Usuario(user["id_usuario"], user["nombre"], user["email"], user["password"])
+
 # -------------------------
 # LOGIN
 # -------------------------
-@app.route("/login", methods=["GET","POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = request.form["email"]
@@ -151,7 +153,7 @@ def login():
 # -------------------------
 # REGISTRO
 # -------------------------
-@app.route("/registro", methods=["GET","POST"])
+@app.route("/registro", methods=["GET", "POST"])
 def registro():
     if request.method == "POST":
         nombre = request.form["nombre"]
@@ -200,7 +202,7 @@ def index():
 # -------------------------
 # AGREGAR LIBRO
 # -------------------------
-@app.route("/agregar", methods=["GET","POST"])
+@app.route("/agregar", methods=["GET", "POST"])
 @login_required
 def agregar():
     if request.method == "POST":
@@ -226,7 +228,7 @@ def agregar():
 # -------------------------
 # EDITAR LIBRO
 # -------------------------
-@app.route("/editar/<int:id>", methods=["GET","POST"])
+@app.route("/editar/<int:id>", methods=["GET", "POST"])
 @login_required
 def editar(id):
     conexion = obtener_conexion()
@@ -293,7 +295,13 @@ def reporte():
     datos = [["ID", "Nombre", "Autor", "Cantidad", "Precio"]]
 
     for libro in libros:
-        datos.append([libro["id"], libro["nombre"], libro["autor"], libro["cantidad"], libro["precio"]])
+        datos.append([
+            libro["id"],
+            libro["nombre"],
+            libro["autor"],
+            libro["cantidad"],
+            libro["precio"]
+        ])
 
     tabla = Table(datos)
     tabla.setStyle(TableStyle([
@@ -306,14 +314,3 @@ def reporte():
 
     buffer.seek(0)
     return make_response(buffer.read())
-
-# -------------------------
-# MAIN
-# -------------------------
-if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 10000))
-
-    inicializar_app()  #  ESTO ES LA CLAVE
-
-    app.run(host="0.0.0.0", port=port)
