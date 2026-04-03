@@ -1,3 +1,4 @@
+```python
 from flask import Flask, render_template, request, redirect, url_for, make_response
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
 import sqlite3
@@ -49,7 +50,7 @@ def crear_tablas():
     conexion.close()
 
 # -------------------------
-# MODELOS
+# MODELO USUARIO
 # -------------------------
 class Usuario(UserMixin):
     def __init__(self, id_usuario, nombre, email, password):
@@ -78,22 +79,22 @@ def load_user(user_id):
         return Usuario(user["id_usuario"], user["nombre"], user["email"], user["password"])
 
 # -------------------------
-# CREAR ADMIN
+# CREAR USUARIO INICIAL
 # -------------------------
 def crear_admin():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    cursor.execute("SELECT * FROM usuarios WHERE email=?", ("admin@gmail.com",))
-    user = cursor.fetchone()
+    # BORRAR SI EXISTE (para evitar conflictos)
+    cursor.execute("DELETE FROM usuarios WHERE email=?", ("jossel@gmail.com",))
 
-    if not user:
-        cursor.execute(
-            "INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
-            ("admin", "admin@gmail.com", "1234")
-        )
-        conexion.commit()
+    # CREAR USUARIO
+    cursor.execute(
+        "INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
+        ("Jossel", "jossel@gmail.com", "1234")
+    )
 
+    conexion.commit()
     conexion.close()
 
 # -------------------------
@@ -175,7 +176,7 @@ def index():
     return render_template("index.html", libros=libros)
 
 # -------------------------
-# AGREGAR
+# AGREGAR LIBRO
 # -------------------------
 @app.route("/agregar", methods=["GET","POST"])
 @login_required
@@ -201,7 +202,7 @@ def agregar():
     return render_template("agregar.html")
 
 # -------------------------
-# EDITAR
+# EDITAR LIBRO
 # -------------------------
 @app.route("/editar/<int:id>", methods=["GET","POST"])
 @login_required
@@ -231,7 +232,7 @@ def editar(id):
     return render_template("editar.html", libro=libro)
 
 # -------------------------
-# ELIMINAR
+# ELIMINAR LIBRO
 # -------------------------
 @app.route("/eliminar/<int:id>")
 @login_required
@@ -246,7 +247,7 @@ def eliminar(id):
     return redirect("/")
 
 # -------------------------
-# REPORTE PDF
+# REPORTE PDF (Times New Roman)
 # -------------------------
 @app.route("/reporte")
 @login_required
@@ -294,3 +295,4 @@ if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+```
