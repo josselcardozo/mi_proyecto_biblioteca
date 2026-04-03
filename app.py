@@ -307,4 +307,7 @@ def reporte():
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 10000))
+
+    inicializar_app()  #  ESTO ES LA CLAVE
+
     app.run(host="0.0.0.0", port=port)
