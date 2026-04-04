@@ -249,22 +249,27 @@ def inventario():
 @login_required
 def agregar():
     if request.method == "POST":
-        conexion = obtener_conexion()
-        cursor = conexion.cursor()
+        try:
+            nombre = request.form["nombre"]
+            autor = request.form["autor"]
+            cantidad = int(request.form["cantidad"])   # 👈 CONVERSIÓN
+            precio = float(request.form["precio"])     # 👈 CONVERSIÓN
 
-        cursor.execute(
-            "INSERT INTO libros (nombre,autor,cantidad,precio) VALUES (?,?,?,?)",
-            (
-                request.form["nombre"],
-                request.form["autor"],
-                request.form["cantidad"],
-                request.form["precio"]
+            conexion = obtener_conexion()
+            cursor = conexion.cursor()
+
+            cursor.execute(
+                "INSERT INTO libros (nombre,autor,cantidad,precio) VALUES (?,?,?,?)",
+                (nombre, autor, cantidad, precio)
             )
-        )
 
-        conexion.commit()
-        conexion.close()
-        return redirect("/")
+            conexion.commit()
+            conexion.close()
+
+            return redirect("/")
+
+        except Exception as e:
+            return f"ERROR AL AGREGAR: {e}"
 
     return render_template("agregar.html")
 
