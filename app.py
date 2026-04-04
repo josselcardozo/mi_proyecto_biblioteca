@@ -31,6 +31,7 @@ def crear_tablas():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
+    # USUARIOS
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS usuarios (
         id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,6 +41,7 @@ def crear_tablas():
     )
     """)
 
+    # LIBROS
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS libros (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,11 +52,22 @@ def crear_tablas():
     )
     """)
 
+    # INVENTARIO
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS inventario (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        libro_id INTEGER,
+        stock INTEGER,
+        ubicacion TEXT,
+        FOREIGN KEY(libro_id) REFERENCES libros(id)
+    )
+    """)
+
     conexion.commit()
     conexion.close()
 
 # -------------------------
-# INICIALIZAR APP (CLAVE PARA RENDER)
+# INICIALIZAR APP (RENDER)
 # -------------------------
 def inicializar_app():
     try:
@@ -63,7 +76,7 @@ def inicializar_app():
         conexion = obtener_conexion()
         cursor = conexion.cursor()
 
-        # Usuario por defecto
+        # USUARIO
         cursor.execute("SELECT * FROM usuarios WHERE email=?", ("jossel@gmail.com",))
         user = cursor.fetchone()
 
@@ -73,7 +86,7 @@ def inicializar_app():
                 ("Jossel", "jossel@gmail.com", "1234")
             )
 
-        # Libro demo
+        # LIBRO DEMO
         cursor.execute("SELECT * FROM libros")
         libros = cursor.fetchall()
 
@@ -83,13 +96,23 @@ def inicializar_app():
                 ("Libro Demo", "Autor Demo", 5, 10.0)
             )
 
+        # INVENTARIO DEMO
+        cursor.execute("SELECT * FROM inventario")
+        inv = cursor.fetchall()
+
+        if not inv:
+            cursor.execute(
+                "INSERT INTO inventario (libro_id, stock, ubicacion) VALUES (?,?,?)",
+                (1, 10, "Estante A")
+            )
+
         conexion.commit()
         conexion.close()
 
     except Exception as e:
         print("ERROR AL INICIAR:", e)
 
-# 👉 SE EJECUTA AQUÍ (IMPORTANTE)
+# 👉 IMPORTANTE PARA RENDER
 inicializar_app()
 
 # -------------------------
@@ -198,6 +221,26 @@ def index():
     conexion.close()
 
     return render_template("index.html", libros=libros)
+
+# -------------------------
+# INVENTARIO
+# -------------------------
+@app.route("/inventario")
+@login_required
+def inventario():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+        SELECT inventario.*, libros.nombre
+        FROM inventario
+        JOIN libros ON inventario.libro_id = libros.id
+    """)
+
+    datos = cursor.fetchall()
+    conexion.close()
+
+    return render_template("inventario.html", datos=datos)
 
 # -------------------------
 # AGREGAR LIBRO
