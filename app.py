@@ -361,4 +361,10 @@ def reporte():
     pdf.build(elementos)
 
     buffer.seek(0)
-    return make_response(buffer.read())
+
+    response = make_response(buffer.read())
+    response.headers["Content-Type"] = "application/pdf"  # 👈 CLAVE
+    response.headers["Content-Disposition"] = "inline; filename=reporte.pdf"  # 👈 OPCIONAL
+    response.headers["Content-Disposition"] = "attachment; filename=reporte.pdf"
+
+    return response
