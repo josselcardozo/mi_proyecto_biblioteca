@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Biblioteca</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
 </head>
 <body>
@@ -24,7 +23,9 @@
     <div class="grid-libros">
         {% for libro in libros %}
         <div class="card">
-            <img src="{{ url_for('static', filename='img/libros.jpg') }}">
+            <!-- IMAGEN CORRECTA -->
+            <img src="{{ url_for('static', filename='img/libros.jpg') }}" alt="Libro">
+
             <h3>{{ libro.nombre }}</h3>
             <p><strong>Autor:</strong> {{ libro.autor }}</p>
             <p><strong>Precio:</strong> $ {{ libro.precio }}</p>

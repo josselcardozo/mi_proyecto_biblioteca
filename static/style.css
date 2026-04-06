@@ -1,6 +1,7 @@
+/* FONDO GENERAL */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: Arial;
 
     background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
                 url('/static/img/fondo.jpg');
@@ -8,6 +9,42 @@ body {
     background-size: cover;
     background-position: center;
     color: white;
+}
+
+/* LOGIN */
+.login-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* CAJA LOGIN */
+.login-container {
+    background: rgba(0,0,0,0.7);
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+/* INPUTS */
+.login-container input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 8px;
+    border: none;
+}
+
+/* BOTÓN */
+.login-container button {
+    width: 100%;
+    padding: 10px;
+    background: #00c3ff;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
 }
 
 /* CONTENEDOR */
@@ -19,23 +56,19 @@ body {
 
 /* MENÚ */
 .menu {
-    margin: 20px 0;
+    margin: 20px;
 }
 
 .menu a {
-    margin: 0 10px;
-    padding: 10px 15px;
+    margin: 5px;
+    padding: 10px;
     background: #00c3ff;
     color: white;
     text-decoration: none;
     border-radius: 8px;
 }
 
-.menu a:hover {
-    background: #0099cc;
-}
-
-/* GRID LIBROS */
+/* GRID */
 .grid-libros {
     display: flex;
     flex-wrap: wrap;
@@ -48,9 +81,8 @@ body {
     width: 220px;
     background: white;
     color: black;
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     transition: transform 0.3s;
 }
 
@@ -64,26 +96,13 @@ body {
     border-radius: 10px;
 }
 
-/* TEXTO */
-.card h3 {
-    margin: 10px 0;
-}
-
 /* ACCIONES */
-.acciones {
-    margin-top: 10px;
-}
-
 .acciones a {
     display: block;
-    margin: 5px 0;
+    margin: 5px;
     padding: 8px;
     background: #333;
     color: white;
-    text-decoration: none;
     border-radius: 6px;
-}
-
-.acciones a:hover {
-    background: #555;
+    text-decoration: none;
 }
