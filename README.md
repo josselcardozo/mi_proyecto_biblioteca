@@ -42,6 +42,11 @@ Proyecto desarrollado con:
 - MySQL
 - Flask-Login
 
+## 🎥 Demostración del Sistema de Biblioteca
+
+Haz clic en la imagen para ver el video:
+
+[![Ver video](https://img.youtube.com/vi/placeholder/0.jpg)](https://ueaeduec-my.sharepoint.com/:v:/g/personal/jm_cardozoj_uea_edu_ec/IQA55ax9dUVvQI8HLXvIdWEwAUcxVj9BThzsAGIl0qeRkjw)
 Funcionalidades:
 - Registro de usuarios
 - Login y logout
