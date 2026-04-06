@@ -106,3 +106,18 @@ body {
     border-radius: 6px;
     text-decoration: none;
 }
+
+#splash {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: black;
+    color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+
+    z-index: 999;
+}
