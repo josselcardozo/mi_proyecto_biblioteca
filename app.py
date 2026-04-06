@@ -23,17 +23,10 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # -------------------------
 # CONEXIÓN SQLITE
 # -------------------------
-import sqlite3
-
-db = sqlite3.connect("biblioteca.db")
-cursor = db.cursor()
-
-cursor.execute("INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
-               ("Jossel", "jossel@gmail.com", "1234"))
-
-db.commit()
-db.close()
-exit()
+def obtener_conexion():
+    conexion = sqlite3.connect("biblioteca.db")
+    conexion.row_factory = sqlite3.Row
+    return conexion
 
 # -------------------------
 # CREAR TABLAS
@@ -51,7 +44,6 @@ def crear_tablas():
     )
     """)
 
-    # 🔥 SE AGREGA IMAGEN
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS libros (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,16 +52,6 @@ def crear_tablas():
         cantidad INTEGER,
         precio REAL,
         imagen TEXT
-    )
-    """)
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS inventario (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        libro_id INTEGER,
-        stock INTEGER,
-        ubicacion TEXT,
-        FOREIGN KEY(libro_id) REFERENCES libros(id)
     )
     """)
 
@@ -149,6 +131,8 @@ def login():
             usuario = Usuario(user["id_usuario"], user["nombre"], user["email"], user["password"])
             login_user(usuario)
             return redirect(url_for("index"))
+        else:
+            return "❌ Correo o contraseña incorrectos"
 
     return render_template("login.html")
 
@@ -168,7 +152,7 @@ def index():
     return render_template("index.html", libros=libros)
 
 # -------------------------
-# AGREGAR LIBRO (CON IMAGEN)
+# AGREGAR LIBRO
 # -------------------------
 @app.route("/agregar", methods=["GET", "POST"])
 @login_required
@@ -180,9 +164,9 @@ def agregar():
         precio = float(request.form["precio"])
 
         imagen = request.files["imagen"]
-        nombre_imagen = secure_filename(imagen.filename)
 
-        if nombre_imagen != "":
+        if imagen and imagen.filename != "":
+            nombre_imagen = secure_filename(imagen.filename)
             ruta = os.path.join(app.config['UPLOAD_FOLDER'], nombre_imagen)
             imagen.save(ruta)
         else:
@@ -306,6 +290,8 @@ def reporte():
 
     return response
 
+# -------------------------
+# MAIN
 # -------------------------
 if __name__ == "__main__":
     app.run(debug=True)
