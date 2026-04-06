@@ -23,10 +23,10 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # -------------------------
 # CONEXIÓN SQLITE
 # -------------------------
-import mysql.connector
+import sqlite3
 
 def obtener_conexion():
-    return mysql.connector.connect(
+    return sqlite3.connect("biblioteca.db")
         host="localhost",
         user="root",
         password="",
