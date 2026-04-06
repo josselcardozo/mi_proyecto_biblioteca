@@ -27,11 +27,11 @@ import sqlite3
 
 def obtener_conexion():
     return sqlite3.connect("biblioteca.db")
-        host="localhost",
-        user="root",
-        password="",
-        database="biblioteca"
-    )
+    host="localhost",
+    user="root",
+    password="",
+    database="biblioteca"
+    
 
 # -------------------------
 # CREAR TABLAS
