@@ -4,16 +4,18 @@
     <meta charset="UTF-8">
     <title>Biblioteca</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
 <div class="container">
 
+    <!-- 🔥 BIENVENIDA -->
     <div class="bienvenida">
-    <h1>📚 BIENVENIDO A LA BIBLIOTECA VIRTUAL</h1>
-    <p>Explora, gestiona y disfruta tus libros</p>
-</div>
+        <h1>📚 BIENVENIDO A LA BIBLIOTECA VIRTUAL</h1>
+        <p>Explora, gestiona y disfruta tus libros</p>
+    </div>
 
     <h1>📚 Sistema de Biblioteca</h1>
 
@@ -28,8 +30,9 @@
     <div class="grid-libros">
         {% for libro in libros %}
         <div class="card">
-            <!-- IMAGEN CORRECTA -->
-            <img src="{{ url_for('static', filename='img/libros.jpg') }}" alt="Libro">
+
+            <!-- ✅ IMAGEN CORRECTA -->
+            <img src="{{ url_for('static', filename='imagenes/libros.jpg') }}">
 
             <h3>{{ libro.nombre }}</h3>
             <p><strong>Autor:</strong> {{ libro.autor }}</p>
@@ -45,12 +48,6 @@
     </div>
 
 </div>
-
-<script>
-setTimeout(() => {
-    document.getElementById("splash").style.display = "none";
-}, 2000);
-</script>
 
 </body>
 </html>

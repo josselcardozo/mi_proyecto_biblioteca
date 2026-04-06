@@ -4,7 +4,7 @@ body {
     font-family: Arial;
 
     background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-                url('/static/img/fondo.jpg');
+                url('/static/imagenes/fondo.jpg');
 
     background-size: cover;
     background-position: center;
@@ -68,6 +68,19 @@ body {
     border-radius: 8px;
 }
 
+/* BIENVENIDA */
+.bienvenida {
+    margin: 20px auto;
+    padding: 20px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 12px;
+    width: 80%;
+}
+
+.bienvenida h1 {
+    color: #00c3ff;
+}
+
 /* GRID */
 .grid-libros {
     display: flex;
@@ -105,38 +118,4 @@ body {
     color: white;
     border-radius: 6px;
     text-decoration: none;
-}
-
-#splash {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: black;
-    color: white;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 30px;
-
-    z-index: 999;
-}
-
-.bienvenida {
-    margin: 20px auto;
-    padding: 20px;
-    background: rgba(0,0,0,0.7);
-    border-radius: 12px;
-    width: 80%;
-    text-align: center;
-}
-
-.bienvenida h1 {
-    font-size: 35px;
-    color: #00c3ff;
-}
-
-.bienvenida p {
-    font-size: 18px;
-    color: white;
 }
