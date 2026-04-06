@@ -28,12 +28,12 @@ import sqlite3
 db = sqlite3.connect("biblioteca.db")
 cursor = db.cursor()
 
-cursor.execute("ALTER TABLE libros ADD COLUMN imagen TEXT")
+cursor.execute("INSERT INTO usuarios (nombre,email,password) VALUES (?,?,?)",
+               ("Jossel", "jossel@gmail.com", "1234"))
 
 db.commit()
 db.close()
 exit()
-    
 
 # -------------------------
 # CREAR TABLAS
