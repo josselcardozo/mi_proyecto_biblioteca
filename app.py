@@ -25,12 +25,14 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # -------------------------
 import sqlite3
 
-def obtener_conexion():
-    return sqlite3.connect("biblioteca.db")
-    host="localhost",
-    user="root",
-    password="",
-    database="biblioteca"
+db = sqlite3.connect("biblioteca.db")
+cursor = db.cursor()
+
+cursor.execute("ALTER TABLE libros ADD COLUMN imagen TEXT")
+
+db.commit()
+db.close()
+exit()
     
 
 # -------------------------
