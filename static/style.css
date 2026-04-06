@@ -121,3 +121,22 @@ body {
 
     z-index: 999;
 }
+
+.bienvenida {
+    margin: 20px auto;
+    padding: 20px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 12px;
+    width: 80%;
+    text-align: center;
+}
+
+.bienvenida h1 {
+    font-size: 35px;
+    color: #00c3ff;
+}
+
+.bienvenida p {
+    font-size: 18px;
+    color: white;
+}
