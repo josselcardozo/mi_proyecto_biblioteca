@@ -1,46 +1,44 @@
-```html
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <title>Biblioteca</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
 </head>
 <body>
 
 <div class="container">
-    <h1>📖 Lista de Libros</h1>
 
-    <a href="/agregar">➕ Agregar Libro</a> |
-    <a href="/reporte">📄 Descargar PDF</a> |
-    <a href="/logout">🚪 Salir</a>
+    <h1>📚 Sistema de Biblioteca</h1>
 
-    <br><br>
+    <div class="menu">
+        <a href="/agregar">➕ Agregar Libro</a>
+        <a href="/reporte">📄 Descargar PDF</a>
+        <a href="/logout">🚪 Salir</a>
+    </div>
 
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Autor</th>
-            <th>Cantidad</th>
-            <th>Precio</th>
-            <th>Acciones</th>
-        </tr>
+    <h2>📖 Catálogo de Libros</h2>
 
+    <div class="grid-libros">
         {% for libro in libros %}
-        <tr>
-            <td>{{ libro.id }}</td>
-            <td>{{ libro.nombre }}</td>
-            <td>{{ libro.autor }}</td>
-            <td>{{ libro.cantidad }}</td>
-            <td>{{ libro.precio }}</td>
-            <td>
-                <a href="/editar/{{ libro.id }}">✏️</a>
-                <a href="/eliminar/{{ libro.id }}">🗑️</a>
-            </td>
-        </tr>
+        <div class="card">
+            <img src="{{ url_for('static', filename='img/libros.jpg') }}">
+            <h3>{{ libro.nombre }}</h3>
+            <p><strong>Autor:</strong> {{ libro.autor }}</p>
+            <p><strong>Precio:</strong> $ {{ libro.precio }}</p>
+            <p><strong>Cantidad:</strong> {{ libro.cantidad }}</p>
+
+            <div class="acciones">
+                <a href="/editar/{{ libro.id }}">✏️ Editar</a>
+                <a href="/eliminar/{{ libro.id }}">🗑️ Eliminar</a>
+            </div>
+        </div>
         {% endfor %}
-    </table>
+    </div>
+
 </div>
 
 </body>
 </html>
-```

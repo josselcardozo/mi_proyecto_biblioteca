@@ -1,56 +1,89 @@
-```css
 body {
+    margin: 0;
     font-family: Arial, sans-serif;
-    background-image: url('/static/img/fondo.jpg');
+
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                url('/static/img/fondo.jpg');
+
     background-size: cover;
+    background-position: center;
     color: white;
 }
 
+/* CONTENEDOR */
 .container {
-    background: rgba(0,0,0,0.7);
-    padding: 20px;
-    margin: 50px auto;
-    width: 80%;
-    border-radius: 10px;
-}
-
-h1 {
+    width: 90%;
+    margin: auto;
     text-align: center;
 }
 
-table {
-    width: 100%;
+/* MENÚ */
+.menu {
+    margin: 20px 0;
+}
+
+.menu a {
+    margin: 0 10px;
+    padding: 10px 15px;
+    background: #00c3ff;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+.menu a:hover {
+    background: #0099cc;
+}
+
+/* GRID LIBROS */
+.grid-libros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* TARJETAS */
+.card {
+    width: 220px;
     background: white;
     color: black;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+/* IMAGEN */
+.card img {
+    width: 100%;
     border-radius: 10px;
 }
 
-button {
-    background: #4CAF50;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
+/* TEXTO */
+.card h3 {
+    margin: 10px 0;
 }
 
-a {
-    color: yellow;
+/* ACCIONES */
+.acciones {
+    margin-top: 10px;
 }
 
-
-header {
-    background-color: #2c3e50;
-    color: white;
-    padding: 10px;
-}
-
-nav a {
-    margin-right: 15px;
+.acciones a {
+    display: block;
+    margin: 5px 0;
+    padding: 8px;
+    background: #333;
     color: white;
     text-decoration: none;
+    border-radius: 6px;
 }
 
-footer {
-    margin-top: 20px;
-    font-size: 12px;
+.acciones a:hover {
+    background: #555;
 }

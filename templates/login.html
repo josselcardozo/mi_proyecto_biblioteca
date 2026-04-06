@@ -1,24 +1,24 @@
-```html
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+    <meta charset="UTF-8">
+    <title>Login - Biblioteca</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body class="login-body">
 
-<div class="container">
+<div class="login-container">
     <h1>📚 Sistema Biblioteca</h1>
 
     <form method="POST">
-        <input type="email" name="email" placeholder="Correo" required><br><br>
-        <input type="password" name="password" placeholder="Contraseña" required><br><br>
+        <input type="email" name="email" placeholder="Correo" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+
         <button type="submit">Ingresar</button>
     </form>
 
-    <br>
     <a href="/registro">Crear cuenta</a>
 </div>
 
 </body>
 </html>
-```
